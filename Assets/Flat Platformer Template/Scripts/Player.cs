@@ -13,6 +13,7 @@ public class Player : MonoBehaviour {
     public Camera cam;
     public bool mirror;
     public Vector2 _lastPosition;
+    public HealthSystem playerHealth;
 
 
     private bool _canJump, _canWalk;
@@ -25,6 +26,8 @@ public class Player : MonoBehaviour {
 
 	void Start ()
     {
+        playerHealth = gameObject.GetComponent<HealthSystem>();
+        playerHealth.SetHp(100);
         anim = _Blade.gameObject.GetComponent<Animator>();
         rig = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
