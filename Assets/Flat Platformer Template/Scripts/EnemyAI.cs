@@ -10,6 +10,7 @@ public class EnemyAI : MonoBehaviour
     GameObject attackObject;
     Vector3 playerRelativeDirection;
     Vector3 defendObjectRelativeDirection;
+    public HealthSystem enemyHealth;
 
     float distanceToPlayer;
     float distanceToDefendObject;
@@ -20,10 +21,12 @@ public class EnemyAI : MonoBehaviour
     private float _startScale;
     private float lastAttackTime;
     public float attackDelay;
-    public float damage;
+    public float damage = 10;
 
     void Start()
     {
+        enemyHealth = gameObject.GetComponent<HealthSystem>();
+        enemyHealth.SetHp(20);
         player = GameObject.FindGameObjectWithTag("Player");
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         defendObject = GameObject.FindGameObjectWithTag("DefendObject");
@@ -38,18 +41,19 @@ public class EnemyAI : MonoBehaviour
         defendObjectRelativeDirection = defendObject.transform.InverseTransformPoint(transform.position);
 
         Chase(distanceToPlayer, distanceToDefendObject);
+        if (enemyHealth.GetCurrentHealth() <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 
-    private void Attack(float distanceToPlayer)
+    private void Attack(float distanceToTarget, GameObject target)
     {
         if (Time.time > lastAttackTime + attackDelay)
         {
-            if (distanceToPlayer <= attackRange)
-            {
-                Debug.Log("Atacking player");
-                player.GetComponent<HealthSystem>().Damage(damage);
+                Debug.Log("Atacking player/cart");
+                target.GetComponent<HealthSystem>().Damage(damage);
                 lastAttackTime = Time.time;
-            }
         }
     }
 
@@ -77,10 +81,13 @@ public class EnemyAI : MonoBehaviour
         else if (distanceToPlayer <= attackRange)
         {
             transform.position = Vector2.MoveTowards(transform.position, transform.position, 0);
+            Attack(distanceToPlayer, player);
             HandleFacingToPlayer(playerRelativeDirection, false);
         } else
         {
             ChaseDefendObject(distanceToDefendObject);
+            if(distanceToDefendObject <= attackObjectDistance)
+                Attack(distanceToPlayer, defendObject);
             HandleFacingToPlayer(playerRelativeDirection, true);
         }
     }

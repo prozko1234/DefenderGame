@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class DefendObject : MonoBehaviour
 {
-    // Start is called before the first frame update
+    HealthSystem defendObjectHealthSystem;
     void Start()
     {
-        
+        defendObjectHealthSystem = transform.GetComponent<HealthSystem>();
+        defendObjectHealthSystem.SetHp(200);
     }
 
     // Update is called once per frame

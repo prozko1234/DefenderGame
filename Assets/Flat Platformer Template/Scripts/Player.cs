@@ -14,8 +14,11 @@ public class Player : MonoBehaviour {
     public bool mirror;
     public Vector2 _lastPosition;
     public HealthSystem playerHealth;
+    public Transform attackPoint;
+    public float attackRadius = 0.5f;
+    public LayerMask enemyLayers;
 
-
+    public float attackPower;
     private bool _canJump, _canWalk;
     private bool _isWalk, _isJump;
     private float rot, _startScale;
@@ -51,6 +54,11 @@ public class Player : MonoBehaviour {
         {
             _canWalk = false;
             _isJump = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            Attack();
         }
     }
 
@@ -101,9 +109,6 @@ public class Player : MonoBehaviour {
             _canJump = false;
             _isJump = false;
         }
-
-        anim.SetFloat("LastPosX", dir.x);
-        anim.SetFloat("LastPosY", dir.y);
     }
         
     public bool IsMirror()
@@ -115,16 +120,23 @@ public class Player : MonoBehaviour {
     {
         if(_canJump && _canWalk)
         {
-            if (Input.GetKeyDown(KeyCode.Mouse0))
+            anim.SetTrigger("Attack");
+            anim.SetBool("IsMirror", false);
+            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRadius, enemyLayers);
+            foreach(Collider2D enemy in hitEnemies)
             {
-                anim.SetTrigger("Attack");
-                Debug.Log("Player attacked");
+                var enemyHealth = enemy.GetComponent<HealthSystem>();
+                enemyHealth.Damage(attackPower);
+                Debug.Log("we hit " + enemy.name);
             }
+            Debug.Log("Player attacked");
         }
     }
 
-    void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
-        Gizmos.DrawLine(transform.position, _GroundCast.position);
+        if (attackPoint == null)
+            return;
+        Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
     }
 }
