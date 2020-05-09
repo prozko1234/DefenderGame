@@ -8,7 +8,7 @@ public class DefendObject : MonoBehaviour
     void Start()
     {
         defendObjectHealthSystem = transform.GetComponent<HealthSystem>();
-        defendObjectHealthSystem.SetHp(200);
+        defendObjectHealthSystem.SetHp(50);
     }
 
     // Update is called once per frame
